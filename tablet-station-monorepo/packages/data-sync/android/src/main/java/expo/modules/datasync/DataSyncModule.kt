@@ -5,9 +5,41 @@ import expo.modules.kotlin.modules.ModuleDefinition
 import java.net.URL
 
 class DataSyncModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  private val context: Context
+    get() = appContext.reactContext ?: throw Exception("React context not found")
+
+  private val connectivityManager by lazy {
+    context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+  }
+
+  // Định nghĩa Callback để lắng nghe thay đổi
+  private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+    override fun onAvailable(network: Network) {
+      sendNetworkEvent(true)
+    }
+
+    override fun onLost(network: Network) {
+      sendNetworkEvent(false)
+    }
+  }
+
+  private fun sendNetworkEvent(isConnected: Boolean) {
+    // Xác định loại mạng (Wifi/Cellular)
+    val activeNetwork = connectivityManager.activeNetwork
+    val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+    val type = when {
+      capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> "wifi"
+      capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "cellular"
+      else -> "none"
+    }
+
+    // Gửi event về JS với đúng cấu trúc Payload
+    sendEvent("onNetworkStatusChange", mapOf(
+      "isConnected" to isConnected,
+      "type" to type
+    ))
+  }
+
   override fun definition() = ModuleDefinition {
     // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
     // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
@@ -36,15 +68,31 @@ class DataSyncModule : Module() {
       ))
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(DataSyncView::class) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { view: DataSyncView, url: URL ->
-        view.webView.loadUrl(url.toString())
-      }
-      // Defines an event that the view can send to JavaScript.
-      Events("onLoad")
+    //Define a function to get the battery percentage.
+    Function("getBatteryLevel") {
+      // Lấy context của ứng dụng React Native hiện tại
+      val context = appContext.reactContext ?: return@Function -1
+      
+      val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+      val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+      
+      return@Function batteryLevel
+    }
+
+    //Define a function to get the battery percentage.
+    // Đăng ký tên sự kiện mà JS sẽ lắng nghe
+    Events("onNetworkStatusChange")
+
+    // Hàm bổ trợ để bắn event về JS
+    Function("startObservingNetwork") {
+      val request = NetworkRequest.Builder()
+        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        .build()
+      connectivityManager.registerNetworkCallback(request, networkCallback)
+    }
+
+    Function("stopObservingNetwork") {
+      connectivityManager.unregisterNetworkCallback(networkCallback)
     }
   }
 }
