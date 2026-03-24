@@ -5,9 +5,9 @@ declare class DataSyncModule extends NativeModule<DataSyncModuleEvents> {
   PI: number;
   hello(): string;
   setValueAsync(value: string): Promise<void>;
-  getBatteryLevel(): number; // Hàm đồng bộ lấy pin
-  startObservingNetwork(): void; // Hàm kích hoạt listener ở Android
-  stopObservingNetwork(): void; // Hàm hủy listener
+  getBatteryLevel(): number;
+  startObservingNetwork(): void;
+  stopObservingNetwork(): void;
 }
 
 // This call loads the native module object from the JSI.

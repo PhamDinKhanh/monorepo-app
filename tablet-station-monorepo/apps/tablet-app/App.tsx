@@ -2,10 +2,40 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { StatusBar } from 'expo-status-bar';
 
+import {
+  NATIVE_PI,
+  getBatteryLevel,
+  addNetworkListener
+} from '../../packages/data-sync';
+import { useEffect, useState } from 'react';
+
+
+
 export default function App() {
+  const [statusNetwork, setStatusNetwork] = useState<string>('');
+  const [typeNetwork, setTypeNetwork] = useState<string>('');
+
+  useEffect(() => {
+
+    // 1. Đăng ký lắng nghe event từ Kotlin gửi lên (ví dụ: đang tải 45% bảng Users)
+    const progressNetworkListener = addNetworkListener((event) => {
+      setStatusNetwork(event.isConnected ? 'connected' : 'disconnected')
+      setTypeNetwork(event.type)
+    });
+
+    // 2. RẤT QUAN TRỌNG: Dọn dẹp listener khi component unmount để tránh memory leak
+    return () => {
+      progressNetworkListener.remove();
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <Text>The Native PI value: {NATIVE_PI}</Text>
+      <Text>The BatteryLevel: {getBatteryLevel()}</Text>
+      <Text>The status network: {statusNetwork}</Text>
+      <Text>The type netwotk: {typeNetwork}</Text>
+
       <StatusBar style='auto' />
     </View>
   );

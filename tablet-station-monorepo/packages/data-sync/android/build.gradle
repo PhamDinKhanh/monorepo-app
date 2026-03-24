@@ -1,6 +1,8 @@
 plugins {
   id 'com.android.library'
   id 'expo-module-gradle-plugin'
+  id 'kotlin-android'
+  id 'kotlin-kapt'
 }
 
 group = 'expo.modules.datasync'
@@ -12,7 +14,41 @@ android {
     versionCode 1
     versionName "0.1.0"
   }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  kotlinOptions {
+    jvmTarget = '1.8'
+  }
+
   lintOptions {
     abortOnError false
   }
+}
+
+dependencies {
+  // 1. Koin cho Android
+  def koin_version = "3.5.3"
+  implementation "io.insert-koin:koin-android:$koin_version"
+
+  // 2. SQLCipher (Encryption)
+  implementation "androidx.sqlite:sqlite-ktx:2.4.0"
+  implementation "net.zetetic:android-database-sqlcipher:4.5.4"
+
+  // 3. Room Database
+  def room_version = "2.6.1"
+  implementation "androidx.room:room-runtime:$room_version"
+  implementation "androidx.room:room-ktx:$room_version"
+  kapt "androidx.room:room-compiler:$room_version"
+
+  // 4. WorkManager
+  def work_version = "2.9.0"
+  implementation "androidx.work:work-runtime-ktx:$work_version"
+
+  // 3. Retrofit
+  implementation "com.squareup.retrofit2:retrofit:2.9.0"
+  implementation "com.squareup.retrofit2:converter-gson:2.9.0"
 }

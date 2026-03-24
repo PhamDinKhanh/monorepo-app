@@ -1,5 +1,11 @@
 package expo.modules.datasync
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.os.BatteryManager
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import java.net.URL
@@ -11,8 +17,6 @@ class DataSyncModule : Module() {
   private val connectivityManager by lazy {
     context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
   }
-
-  // Định nghĩa Callback để lắng nghe thay đổi
   private val networkCallback = object : ConnectivityManager.NetworkCallback() {
     override fun onAvailable(network: Network) {
       sendNetworkEvent(true)
@@ -24,7 +28,6 @@ class DataSyncModule : Module() {
   }
 
   private fun sendNetworkEvent(isConnected: Boolean) {
-    // Xác định loại mạng (Wifi/Cellular)
     val activeNetwork = connectivityManager.activeNetwork
     val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
     val type = when {
@@ -33,7 +36,6 @@ class DataSyncModule : Module() {
       else -> "none"
     }
 
-    // Gửi event về JS với đúng cấu trúc Payload
     sendEvent("onNetworkStatusChange", mapOf(
       "isConnected" to isConnected,
       "type" to type
@@ -80,10 +82,8 @@ class DataSyncModule : Module() {
     }
 
     //Define a function to get the battery percentage.
-    // Đăng ký tên sự kiện mà JS sẽ lắng nghe
     Events("onNetworkStatusChange")
 
-    // Hàm bổ trợ để bắn event về JS
     Function("startObservingNetwork") {
       val request = NetworkRequest.Builder()
         .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
