@@ -45,3 +45,4 @@ google-services.json
 .env
 .env.local
 .DS_Store
+.eslintcache
