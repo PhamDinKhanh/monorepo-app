@@ -9,6 +9,14 @@ dist/
 web-build/
 expo-env.d.ts
 
+# Turbo
+.turbo/
+
+# Linter & Formatter cache
+.eslintcache
+.stylelintcache
+.prettiercache
+
 # Native
 .kotlin/
 *.orig.*
