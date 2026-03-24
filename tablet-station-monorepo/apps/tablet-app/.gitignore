@@ -13,9 +13,9 @@ expo-env.d.ts
 .turbo/
 
 # Linter & Formatter cache
-*.eslintcache
-*.stylelintcache
-*.prettiercache
+.eslintcache
+.stylelintcache
+.prettiercache
 
 # Native
 .kotlin/
