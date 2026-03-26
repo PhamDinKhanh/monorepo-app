@@ -1,4 +1,9 @@
 package expo.modules.datasync.data.local
 
-class DataDao {
+import androidx.room.Dao
+
+
+@Dao
+interface DataDao {
+
 }
