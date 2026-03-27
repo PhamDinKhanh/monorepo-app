@@ -1,6 +1,7 @@
-package expo.modules.datasync.data.remote.api
+package expo.modules.datasync.data.remote
 
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import expo.modules.datasync.data.remote.api.PokeApiService
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -10,11 +11,8 @@ import java.util.concurrent.TimeUnit
 object NetworkClient {
     private const val BASE_URL = "https://pokeapi.co/"
 
-    // 1. Cấu hình kotlin.serialization
     private val json = Json {
-        // CỰC KỲ QUAN TRỌNG: Bỏ qua các keys API trả về mà Model không khai báo
         ignoreUnknownKeys = true
-        // Ép kiểu an toàn (ví dụ API trả null nhưng type là String, nó sẽ gán default)
         coerceInputValues = true
     }
 
@@ -25,10 +23,10 @@ object NetworkClient {
         // Bạn có thể .addInterceptor() ở đây sau này
         .build()
 
+    // 2. Cấu hình Retrofit
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(okHttpClient)
-        // Tích hợp kotlinx.serialization vào Retrofit
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()
 

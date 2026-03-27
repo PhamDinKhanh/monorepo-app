@@ -1,4 +1,4 @@
-package expo.modules.datasync
+package expo.modules.datasync.presentation.modules
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -8,39 +8,10 @@ import android.net.NetworkRequest
 import android.os.BatteryManager
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.net.URL
 
 class DataSyncModule : Module() {
   private val context: Context
     get() = appContext.reactContext ?: throw Exception("React context not found")
-
-  private val connectivityManager by lazy {
-    context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-  }
-  private val networkCallback = object : ConnectivityManager.NetworkCallback() {
-    override fun onAvailable(network: Network) {
-      sendNetworkEvent(true)
-    }
-
-    override fun onLost(network: Network) {
-      sendNetworkEvent(false)
-    }
-  }
-
-  private fun sendNetworkEvent(isConnected: Boolean) {
-    val activeNetwork = connectivityManager.activeNetwork
-    val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-    val type = when {
-      capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> "wifi"
-      capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "cellular"
-      else -> "none"
-    }
-
-    sendEvent("onNetworkStatusChange", mapOf(
-      "isConnected" to isConnected,
-      "type" to type
-    ))
-  }
 
   override fun definition() = ModuleDefinition {
     // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
@@ -74,25 +45,11 @@ class DataSyncModule : Module() {
     Function("getBatteryLevel") {
       // Lấy context của ứng dụng React Native hiện tại
       val context = appContext.reactContext ?: return@Function -1
-      
+
       val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
       val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-      
+
       return@Function batteryLevel
-    }
-
-    //Define a function to get the battery percentage.
-    Events("onNetworkStatusChange")
-
-    Function("startObservingNetwork") {
-      val request = NetworkRequest.Builder()
-        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        .build()
-      connectivityManager.registerNetworkCallback(request, networkCallback)
-    }
-
-    Function("stopObservingNetwork") {
-      connectivityManager.unregisterNetworkCallback(networkCallback)
     }
   }
 }

@@ -17,13 +17,11 @@ export default function App() {
 
   useEffect(() => {
 
-    // 1. Đăng ký lắng nghe event từ Kotlin gửi lên (ví dụ: đang tải 45% bảng Users)
     const progressNetworkListener = addNetworkListener((event) => {
       setStatusNetwork(event.isConnected ? 'connected' : 'disconnected')
       setTypeNetwork(event.type)
     });
 
-    // 2. RẤT QUAN TRỌNG: Dọn dẹp listener khi component unmount để tránh memory leak
     return () => {
       progressNetworkListener.remove();
     };
