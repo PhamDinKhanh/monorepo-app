@@ -14,6 +14,6 @@ data class SyncQueueEntity(
     val occurredAt: String,
     val retryCount: Int = 0,
     // payload will contain object need to be sync.
-    val payload: Any? = null
+//    val payload: Any? = null
 
 )

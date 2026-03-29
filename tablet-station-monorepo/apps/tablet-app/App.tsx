@@ -5,7 +5,9 @@ import { StatusBar } from 'expo-status-bar';
 import {
   NATIVE_PI,
   getBatteryLevel,
-  addNetworkListener
+  checkIsConnected,
+  fetchNetworkInfo, 
+  subscribeToNetworkChanges, 
 } from '../../packages/data-sync';
 import { useEffect, useState } from 'react';
 
@@ -17,20 +19,17 @@ export default function App() {
 
   useEffect(() => {
 
-    const progressNetworkListener = addNetworkListener((event) => {
+   subscribeToNetworkChanges((event) => {
       setStatusNetwork(event.isConnected ? 'connected' : 'disconnected')
       setTypeNetwork(event.type)
     });
-
-    return () => {
-      progressNetworkListener.remove();
-    };
   }, []);
 
   return (
     <View style={styles.container}>
       <Text>The Native PI value: {NATIVE_PI}</Text>
       <Text>The BatteryLevel: {getBatteryLevel()}</Text>
+      <Text>Check is Connect: {checkIsConnected()}</Text>
       <Text>The status network: {statusNetwork}</Text>
       <Text>The type netwotk: {typeNetwork}</Text>
 

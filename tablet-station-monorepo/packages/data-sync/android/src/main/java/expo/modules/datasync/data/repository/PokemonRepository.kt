@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class PokemonRepository {
-    private val api = NetworkClient.pokeApi
+    private val api = NetworkClient.providePokeApi(NetworkClient.provideRetrofit())
 
     suspend fun fetchPokemon(name: String): PokemonResponse? {
         return withContext(Dispatchers.IO) {

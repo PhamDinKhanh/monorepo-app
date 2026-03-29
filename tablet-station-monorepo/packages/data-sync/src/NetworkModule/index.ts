@@ -18,11 +18,7 @@ export const fetchNetworkInfo = async (): Promise<NetworkInfo> => {
 export const subscribeToNetworkChanges = (
     callback: (info: NetworkInfo) => void
 ): (() => void) => {
-    // Nhờ NetworkModuleType, chữ 'networkChanged' sẽ được TS tự động gợi ý (autocomplete).
-    // Nếu bạn gõ sai tên event, TS sẽ báo lỗi compile ngay lập tức.
     const subscription = NetworkModule.addListener('networkChanged', callback);
-
-    // Trả về hàm dọn dẹp thuần túy
     return () => {
         subscription.remove();
     };

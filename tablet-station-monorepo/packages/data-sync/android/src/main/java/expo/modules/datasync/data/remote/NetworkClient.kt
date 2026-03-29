@@ -9,27 +9,30 @@ import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
 object NetworkClient {
-    private const val BASE_URL = "https://pokeapi.co/"
+    internal const val BASE_URL = "https://pokeapi.co/"
 
-    private val json = Json {
+    internal val json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
 
-    // 2. Cấu hình OkHttp Engine
-    private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        // Bạn có thể .addInterceptor() ở đây sau này
-        .build()
+    fun provideRetrofit(): Retrofit {
+        // 2. Cấu hình OkHttp Engine
+         val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            // Bạn có thể .addInterceptor() ở đây sau này
+            .build()
 
-    // 2. Cấu hình Retrofit
-    val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-        .build()
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
 
     // Tạo instance của ApiService
-    val pokeApi: PokeApiService = retrofit.create(PokeApiService::class.java)
+    fun providePokeApi(retrofit: Retrofit): PokeApiService {
+        return retrofit.create(PokeApiService::class.java)
+    }
 }

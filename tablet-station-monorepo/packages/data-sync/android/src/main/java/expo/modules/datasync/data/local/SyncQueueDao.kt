@@ -3,6 +3,7 @@ package expo.modules.datasync.data.local
 import androidx.room.*
 import androidx.room.OnConflictStrategy
 
+@Dao
 interface SyncQueueDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

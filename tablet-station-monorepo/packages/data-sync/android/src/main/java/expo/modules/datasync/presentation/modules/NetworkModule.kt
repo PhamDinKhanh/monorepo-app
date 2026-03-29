@@ -1,5 +1,6 @@
 package expo.modules.datasync.presentation.modules
 
+import expo.modules.datasync.core.network.AndroidNetworkMonitor
 import expo.modules.datasync.core.network.NetworkMonitor
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -9,10 +10,13 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-class NetworkModule(
-    private val networkMonitor: NetworkMonitor
-) : Module()
+class NetworkModule: Module()
 {
+    private val networkMonitor: NetworkMonitor by lazy {
+        val context = appContext.reactContext ?: throw IllegalStateException("React Context bị null")
+        // Khởi tạo Implementation và gán vào Interface
+        AndroidNetworkMonitor(context)
+    }
     private val moduleJob = SupervisorJob()
 
     private val moduleScope = CoroutineScope(Dispatchers.IO + moduleJob)

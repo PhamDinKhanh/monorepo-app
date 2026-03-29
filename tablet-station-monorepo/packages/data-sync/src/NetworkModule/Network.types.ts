@@ -2,7 +2,7 @@
 export type NetworkInfo = {
     isConnected: boolean
     isValidated: boolean
-    type: 'WIFI' | 'CELLULAR' | 'NONE'
+    type: 'WIFI' | 'CELLULAR' | 'UNKNOWN'
 }
 
 export type NetworkModuleEvents = {

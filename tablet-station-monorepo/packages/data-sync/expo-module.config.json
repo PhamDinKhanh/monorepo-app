@@ -1,6 +1,9 @@
 {
   "platforms": ["android"],
   "android": {
-    "modules": ["expo.modules.datasync.DataSyncModule"]
+    "modules": [
+      "expo.modules.datasync.presentation.modules.DataSyncModule",
+      "expo.modules.datasync.presentation.modules.NetworkModule"
+    ]
   }
 }
