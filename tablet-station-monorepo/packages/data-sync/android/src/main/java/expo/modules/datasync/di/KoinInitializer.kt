@@ -1,16 +1,16 @@
 package expo.modules.datasync.di
 
-import android.app.Application
-import expo.modules.core.interfaces.ApplicationLifecycleListener
+import android.content.Context
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 
-class KoinApplicationLifecycleListener: ApplicationLifecycleListener {
-    override fun onCreate(application: Application) {
+
+object KoinInitializer {
+    fun start(context: Context) {
         if (GlobalContext.getOrNull() == null) {
             startKoin {
-                androidContext(application)
+                androidContext(context.applicationContext)
                 modules(coreModule)
             }
         }

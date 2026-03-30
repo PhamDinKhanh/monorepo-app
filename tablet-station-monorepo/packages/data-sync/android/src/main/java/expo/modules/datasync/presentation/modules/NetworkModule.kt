@@ -1,7 +1,7 @@
 package expo.modules.datasync.presentation.modules
 
-import expo.modules.datasync.core.network.AndroidNetworkMonitor
 import expo.modules.datasync.core.network.NetworkMonitor
+import expo.modules.datasync.di.KoinInitializer
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.CoroutineScope
@@ -9,22 +9,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class NetworkModule: Module()
+class NetworkModule: Module(), KoinComponent
 {
-    private val networkMonitor: NetworkMonitor by lazy {
-        val context = appContext.reactContext ?: throw IllegalStateException("React Context bị null")
-        // Khởi tạo Implementation và gán vào Interface
-        AndroidNetworkMonitor(context)
-    }
+    private val networkMonitor: NetworkMonitor by inject()
+
     private val moduleJob = SupervisorJob()
 
     private val moduleScope = CoroutineScope(Dispatchers.IO + moduleJob)
 
     override fun definition() = ModuleDefinition {
         Name("NetworkModule")
-
         Events("networkChanged")
+
+        OnCreate {
+            KoinInitializer.start(appContext.reactContext!!)
+        }
         
         Function("isConnected") {
             val isConnected = networkMonitor.isConnected()
